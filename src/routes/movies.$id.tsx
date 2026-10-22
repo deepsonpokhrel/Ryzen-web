@@ -27,7 +27,7 @@ export const Route = createFileRoute("/movies/$id")({
 function MoviePage() {
   const { movie: m } = Route.useLoaderData();
   const days = nextDays(5);
-  const [date, setDate] = useState(days[0]);
+  const [date, setDate] = useState(days[0]!);
   const [city, setCity] = useCity();
   const [format, setFormat] = useState("All");
   const [tab, setTab] = useState<"show" | "about">("show");

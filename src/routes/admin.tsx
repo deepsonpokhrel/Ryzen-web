@@ -26,7 +26,7 @@ function Admin() {
   const conf = bookings.filter((b) => b.status === "Confirmed");
   const sales = conf.reduce((s, b) => s + b.total, 0);
   const seats = conf.reduce((s, b) => s + b.seats.length, 0);
-  const today = nextDays(1)[0];
+  const today = nextDays(1)[0]!;
   const upcoming = movies.flatMap((m) => getShows(m.id, today).filter((s) => s.cinemaId === "civil-mall").slice(0, 1)).sort((a, b) => a.time.localeCompare(b.time));
   const pop = movies.map((m) => ({ m, n: conf.filter((b) => b.movieId === m.id).reduce((s, b) => s + b.seats.length, 0) })).sort((a, b) => b.n - a.n);
 

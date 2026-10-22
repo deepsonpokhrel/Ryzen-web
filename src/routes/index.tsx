@@ -19,7 +19,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const f = movies[0];
+  const f = movies[0]!;
   return (
     <div className="min-h-screen">
       <SiteHeader />
