@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Catalogue (movies, cinemas, showtimes, prices) lives in src/lib/data.ts and bookings persist to localStorage via src/lib/bookings.ts — MVP without a backend; swap to Lovable Cloud when real accounts/payments are needed.

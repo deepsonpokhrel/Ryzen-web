@@ -151,7 +151,7 @@ function BookPage() {
                         const base = cat === "Recliner" ? "bg-seat-recliner" : cat === "Premium" ? "bg-seat-premium" : "bg-seat";
                         return (
                           <button key={id} disabled={isT} onClick={() => toggle(id)} aria-label={`Seat ${id} ${cat}${isT ? " unavailable" : ""}`} aria-pressed={isS}
-                            className={`h-6 w-6 rounded-t-md text-[9px] transition ${i === 6 ? "mr-4" : ""} ${isT ? "cursor-not-allowed bg-seat-taken" : isS ? "bg-primary text-primary-foreground" : `${base} text-background/70 opacity-80 hover:opacity-100`}`}>
+                            className={`h-6 w-6 rounded-t-md text-[9px] transition ${i === 6 ? "mr-4" : ""} ${isT ? "cursor-not-allowed bg-seat-taken" : isS ? "bg-primary text-primary-foreground opacity-100" : `${base} text-background/70 opacity-80 hover:opacity-100`}`}>
                             {isS ? i + 1 : ""}
                           </button>
                         );
