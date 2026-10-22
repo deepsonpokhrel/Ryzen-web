@@ -10,33 +10,91 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as CinemasRouteImport } from './routes/cinemas'
+import { Route as TicketsRouteImport } from './routes/tickets'
+import { Route as BookShowIdRouteImport } from './routes/book.$showId'
+import { Route as MoviesIdRouteImport } from './routes/movies.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CinemasRoute = CinemasRouteImport.update({
+  id: '/cinemas',
+  path: '/cinemas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TicketsRoute = TicketsRouteImport.update({
+  id: '/tickets',
+  path: '/tickets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookShowIdRoute = BookShowIdRouteImport.update({
+  id: '/book/$showId',
+  path: '/book/$showId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MoviesIdRoute = MoviesIdRouteImport.update({
+  id: '/movies/$id',
+  path: '/movies/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/cinemas': typeof CinemasRoute
+  '/tickets': typeof TicketsRoute
+  '/book/$showId': typeof BookShowIdRoute
+  '/movies/$id': typeof MoviesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/cinemas': typeof CinemasRoute
+  '/tickets': typeof TicketsRoute
+  '/book/$showId': typeof BookShowIdRoute
+  '/movies/$id': typeof MoviesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/cinemas': typeof CinemasRoute
+  '/tickets': typeof TicketsRoute
+  '/book/$showId': typeof BookShowIdRoute
+  '/movies/$id': typeof MoviesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/admin' | '/cinemas' | '/tickets' | '/book/$showId' | '/movies/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/admin' | '/cinemas' | '/tickets' | '/book/$showId' | '/movies/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/cinemas'
+    | '/tickets'
+    | '/book/$showId'
+    | '/movies/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  CinemasRoute: typeof CinemasRoute
+  TicketsRoute: typeof TicketsRoute
+  BookShowIdRoute: typeof BookShowIdRoute
+  MoviesIdRoute: typeof MoviesIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +106,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cinemas': {
+      id: '/cinemas'
+      path: '/cinemas'
+      fullPath: '/cinemas'
+      preLoaderRoute: typeof CinemasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tickets': {
+      id: '/tickets'
+      path: '/tickets'
+      fullPath: '/tickets'
+      preLoaderRoute: typeof TicketsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/book/$showId': {
+      id: '/book/$showId'
+      path: '/book/$showId'
+      fullPath: '/book/$showId'
+      preLoaderRoute: typeof BookShowIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/movies/$id': {
+      id: '/movies/$id'
+      path: '/movies/$id'
+      fullPath: '/movies/$id'
+      preLoaderRoute: typeof MoviesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  CinemasRoute: CinemasRoute,
+  TicketsRoute: TicketsRoute,
+  BookShowIdRoute: BookShowIdRoute,
+  MoviesIdRoute: MoviesIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
