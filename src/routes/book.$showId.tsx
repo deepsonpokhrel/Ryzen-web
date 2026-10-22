@@ -49,7 +49,7 @@ function BookPage() {
   }, [sel.length, done]);
   useEffect(() => { if (left <= 0) { setSel([]); setStep(1); setLeft(HOLD); setErr("Your seat hold expired. Please choose seats again."); } }, [left]);
 
-  const subtotal = useMemo(() => sel.reduce((s, id) => s + seatPrice(id[0], show.format), 0), [sel, show.format]);
+  const subtotal = useMemo(() => sel.reduce((s, id) => s + seatPrice(id[0]!, show.format), 0), [sel, show.format]);
   const fees = sel.length * CONVENIENCE_FEE;
   const total = subtotal + fees;
 
@@ -196,7 +196,7 @@ function BookPage() {
               ))}
               {show.format !== "2D" && <p className="text-xs text-muted-foreground">+ {show.format} surcharge included in seat price</p>}
               <p className="mb-2 mt-5 font-semibold">Selected seats</p>
-              {sel.map((s) => <div key={s} className="flex justify-between text-xs text-muted-foreground"><span>{s} · {seatCategory(s[0])}</span><span>{npr(seatPrice(s[0], show.format))}</span></div>)}
+              {sel.map((s) => <div key={s} className="flex justify-between text-xs text-muted-foreground"><span>{s} · {seatCategory(s[0]!)}</span><span>{npr(seatPrice(s[0]!, show.format))}</span></div>)}
               <div className="mt-4 flex justify-between border-t border-border pt-3 font-semibold"><span>Total</span><span>{npr(total)}</span></div>
               <button disabled={!sel.length} onClick={() => (step === 1 ? (setErr(""), setStep(2)) : pay())} className="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-primary py-3 font-semibold text-primary-foreground disabled:opacity-40">
                 {step === 1 ? "Continue to Checkout" : `Pay ${npr(total)}`} <ArrowRight className="h-4 w-4" />

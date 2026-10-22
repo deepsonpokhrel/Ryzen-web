@@ -49,7 +49,7 @@ export function getShows(movieId: string, date: string): Show[] {
 export function parseShowId(id: string): Show | null {
   const [movieId, cinemaId, date, ti] = id.split("__");
   const t = TIMES[Number(ti)];
-  if (!movies.find((m) => m.id === movieId) || !cinemas.find((c) => c.id === cinemaId) || !t) return null;
+  if (!movieId || !cinemaId || !date || !t || !movies.find((m) => m.id === movieId) || !cinemas.find((c) => c.id === cinemaId)) return null;
   return getShows(movieId, date).find((s) => s.id === id) ?? { id, movieId, cinemaId, date, time: t, format: "2D" };
 }
 
