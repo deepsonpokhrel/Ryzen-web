@@ -7,9 +7,9 @@ import { Logo } from "@/components/SiteHeader";
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Admin Dashboard | QFX Cinemas" },
-      { name: "description", content: "QFX Cinemas operations dashboard for staff." },
-      { property: "og:title", content: "QFX Admin Dashboard" },
+      { title: "Admin Dashboard | RYZENX Cinema" },
+      { name: "description", content: "RYZENX Cinema operations dashboard for staff." },
+      { property: "og:title", content: "RYZENX Admin Dashboard" },
       { property: "og:description", content: "Cinema operations overview." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -36,7 +36,7 @@ function Admin() {
         <div className="mb-8 px-2"><Logo /></div>
         <nav className="space-y-1 text-sm">
           {NAV.map(([l, I], i) => (
-            <div key={l} className={`flex items-center gap-3 rounded-md px-3 py-2 ${i === 0 ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
+            <div key={l} className={`flex items-center gap-3 rounded-md px-3 py-2 ${i === 0 ? "bg-gold text-gold-foreground font-semibold" : "text-muted-foreground"}`}>
               <I className="h-4 w-4" />{l}{i > 0 && <span className="ml-auto text-[9px] uppercase opacity-60">soon</span>}
             </div>
           ))}
