@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, CheckCircle2, Timer } from "lucide-react";
 import { cinemas, COLS, CONVENIENCE_FEE, fmtDate, movies, npr, parseShowId, PRICES, ROWS, seatCategory, seatPrice, soldSeats } from "@/lib/data";
 import { addBooking, bookedSeatsFor, newRef, type Booking } from "@/lib/bookings";
+import { GoldenTicket } from "@/components/GoldenTicket";
 import { Logo } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/book/$showId")({
@@ -13,9 +14,9 @@ export const Route = createFileRoute("/book/$showId")({
   },
   head: () => ({
     meta: [
-      { title: "Select Seats | QFX Cinemas" },
-      { name: "description", content: "Choose your seats and complete your QFX Cinemas booking." },
-      { property: "og:title", content: "Select Seats | QFX Cinemas" },
+      { title: "Select Seats | RYZENX Cinema" },
+      { name: "description", content: "Choose your seats and complete your RYZENX Cinema booking." },
+      { property: "og:title", content: "Select Seats | RYZENX Cinema" },
       { property: "og:description", content: "Choose seats and check out securely." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -96,19 +97,14 @@ function BookPage() {
         )}
 
         {step === 3 && done ? (
-          <div className="mx-auto max-w-md rounded-xl border border-border bg-card p-8 text-center">
+          <div className="mx-auto max-w-md text-center">
             <CheckCircle2 className="mx-auto h-12 w-12 text-success" />
-            <h1 className="mt-4 text-4xl">Booking confirmed</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Reference <b className="text-foreground">{done.ref}</b> · sent to {done.email}</p>
-            <div className="my-6 border-y border-dashed border-border py-5 text-left text-sm">
-              <p className="font-display text-2xl">{movie.title}</p>
-              <p className="text-muted-foreground">{cinema.name} · {fmtDate(show.date)} · {show.time} · {show.format}</p>
-              <p className="mt-2">Seats: <b>{done.seats.join(", ")}</b></p>
-              <p>Paid: <b>{npr(done.total)}</b> via {done.payment}</p>
-            </div>
-            <div className="flex justify-center gap-3">
-              <Link to="/tickets" className="rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">View My Tickets</Link>
-              <Link to="/" className="rounded-md border border-border px-5 py-2.5 text-sm">Home</Link>
+            <h1 className="mt-4 text-4xl">Your movie night is on.</h1>
+            <p className="mb-6 mt-1 text-sm text-muted-foreground">Booking confirmed · reference sent to {done.email}</p>
+            <GoldenTicket booking={done} />
+            <div className="mt-6 flex justify-center gap-3">
+              <Link to="/tickets" className="rounded-full bg-gold px-5 py-2.5 text-sm font-semibold text-gold-foreground hover:opacity-90">View My Tickets</Link>
+              <Link to="/" className="rounded-full border border-border px-5 py-2.5 text-sm hover:border-gold hover:text-gold">Home</Link>
             </div>
           </div>
         ) : (
@@ -198,7 +194,7 @@ function BookPage() {
               <p className="mb-2 mt-5 font-semibold">Selected seats</p>
               {sel.map((s) => <div key={s} className="flex justify-between text-xs text-muted-foreground"><span>{s} · {seatCategory(s[0]!)}</span><span>{npr(seatPrice(s[0]!, show.format))}</span></div>)}
               <div className="mt-4 flex justify-between border-t border-border pt-3 font-semibold"><span>Total</span><span>{npr(total)}</span></div>
-              <button disabled={!sel.length} onClick={() => (step === 1 ? (setErr(""), setStep(2)) : pay())} className="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-primary py-3 font-semibold text-primary-foreground disabled:opacity-40">
+              <button disabled={!sel.length} onClick={() => (step === 1 ? (setErr(""), setStep(2)) : pay())} className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-gold py-3 font-semibold text-gold-foreground hover:opacity-90 disabled:opacity-40">
                 {step === 1 ? "Continue to Checkout" : `Pay ${npr(total)}`} <ArrowRight className="h-4 w-4" />
               </button>
             </aside>

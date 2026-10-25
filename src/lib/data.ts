@@ -6,22 +6,35 @@ import p5 from "@/assets/p5.jpg";
 
 export type Movie = {
   id: string; title: string; tagline: string; synopsis: string; genres: string[];
-  duration: string; language: string; rating: string; score: number; poster: string;
+  duration: string; minutes: number; language: string; rating: string; score: number;
+  poster: string; status: "now" | "soon"; moods: string[];
 };
 
 export const movies: Movie[] = [
-  { id: "the-last-horizon", title: "The Last Horizon", tagline: "A team of explorers. A forgotten world. One last chance to save what matters.", synopsis: "A team of explorers embarks on a dangerous mission to a distant planet, where they discover a secret that could change the fate of humanity.", genres: ["Action", "Adventure"], duration: "2h 18m", language: "English", rating: "PG-13", score: 8.4, poster: p1 },
-  { id: "the-silent-city", title: "The Silent City", tagline: "Every street keeps a secret.", synopsis: "A disgraced detective returns to the city that exiled him to solve a string of disappearances no one wants solved.", genres: ["Thriller", "Mystery"], duration: "1h 58m", language: "English", rating: "PG-13", score: 7.6, poster: p2 },
-  { id: "beneath-the-waves", title: "Beneath the Waves", tagline: "The deep remembers.", synopsis: "A marine archaeologist uncovers a sunken city — and the reason it was lost.", genres: ["Drama", "Adventure"], duration: "2h 05m", language: "English", rating: "PG", score: 7.8, poster: p3 },
-  { id: "the-final-chapter", title: "The Final Chapter", tagline: "Some wars end with a whisper.", synopsis: "A lone soldier fights through a burning frontier to deliver one last message.", genres: ["Action", "Sci-Fi"], duration: "2h 22m", language: "Hindi", rating: "A", score: 8.2, poster: p4 },
-  { id: "roads-of-tomorrow", title: "Roads of Tomorrow", tagline: "Home is a direction, not a place.", synopsis: "A young woman leaves Kathmandu to chase a future her family never imagined.", genres: ["Drama", "Sci-Fi"], duration: "2h 01m", language: "Nepali", rating: "PG", score: 7.1, poster: p5 },
+  { id: "the-last-horizon", title: "The Last Horizon", tagline: "A team of explorers. A forgotten world. One last chance to save what matters.", synopsis: "A team of explorers embarks on a dangerous mission to a distant planet, where they discover a secret that could change the fate of humanity.", genres: ["Action", "Adventure"], duration: "2h 18m", minutes: 138, language: "English", rating: "PG-13", score: 8.4, poster: p1, status: "now", moods: ["fun", "family"] },
+  { id: "the-silent-city", title: "The Silent City", tagline: "Every street keeps a secret.", synopsis: "A disgraced detective returns to the city that exiled him to solve a string of disappearances no one wants solved.", genres: ["Thriller", "Mystery"], duration: "1h 58m", minutes: 118, language: "English", rating: "PG-13", score: 7.6, poster: p2, status: "now", moods: ["thriller", "date", "short"] },
+  { id: "beneath-the-waves", title: "Beneath the Waves", tagline: "The deep remembers.", synopsis: "A marine archaeologist uncovers a sunken city — and the reason it was lost.", genres: ["Drama", "Adventure"], duration: "2h 05m", minutes: 125, language: "English", rating: "PG", score: 7.8, poster: p3, status: "now", moods: ["date", "family"] },
+  { id: "the-final-chapter", title: "The Final Chapter", tagline: "Some wars end with a whisper.", synopsis: "A lone soldier fights through a burning frontier to deliver one last message.", genres: ["Action", "Sci-Fi"], duration: "2h 22m", minutes: 142, language: "Hindi", rating: "A", score: 8.2, poster: p4, status: "now", moods: ["thriller", "fun"] },
+  { id: "roads-of-tomorrow", title: "Roads of Tomorrow", tagline: "Home is a direction, not a place.", synopsis: "A young woman leaves Kathmandu to chase a future her family never imagined.", genres: ["Drama", "Sci-Fi"], duration: "2h 01m", minutes: 121, language: "Nepali", rating: "PG", score: 7.1, poster: p5, status: "soon", moods: ["date", "family"] },
 ];
 
+export const MOODS = [
+  { id: "fun", label: "Something fun" },
+  { id: "thriller", label: "A proper thriller" },
+  { id: "date", label: "Date-night pick" },
+  { id: "family", label: "Family friendly" },
+  { id: "short", label: "Under two hours" },
+] as const;
+
+export function pickByMood(mood: string): Movie[] {
+  return movies.filter((m) => m.status === "now" && (mood === "short" ? m.minutes < 120 : m.moods.includes(mood)));
+}
+
 export const cinemas = [
-  { id: "civil-mall", name: "QFX Civil Mall", area: "Civil Mall, Kathmandu", city: "Kathmandu" },
-  { id: "labim", name: "QFX Labim Mall", area: "Pulchowk, Lalitpur", city: "Kathmandu" },
-  { id: "bhaktapur", name: "QFX Bhaktapur", area: "Bhaktapur", city: "Bhaktapur" },
-  { id: "pokhara", name: "QFX Pokhara", area: "Lakeside, Pokhara", city: "Pokhara" },
+  { id: "civil-mall", name: "RYZENX Civil Mall", area: "Civil Mall, Kathmandu", city: "Kathmandu", map: "https://maps.google.com/?q=Civil+Mall+Kathmandu" },
+  { id: "labim", name: "RYZENX Labim Mall", area: "Pulchowk, Lalitpur", city: "Kathmandu", map: "https://maps.google.com/?q=Labim+Mall+Lalitpur" },
+  { id: "bhaktapur", name: "RYZENX Bhaktapur", area: "Bhaktapur", city: "Bhaktapur", map: "https://maps.google.com/?q=Bhaktapur" },
+  { id: "pokhara", name: "RYZENX Pokhara", area: "Lakeside, Pokhara", city: "Pokhara", map: "https://maps.google.com/?q=Lakeside+Pokhara" },
 ];
 export const cities = ["Kathmandu", "Bhaktapur", "Pokhara"];
 
