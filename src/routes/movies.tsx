@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useChildMatches } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Search, Star } from "lucide-react";
 import { movies } from "@/lib/data";
@@ -19,6 +19,10 @@ export const Route = createFileRoute("/movies")({
 });
 
 function MoviesPage() {
+  // /movies is also the parent layout of /movies/$id — render the child when one matches.
+  const child = useChildMatches();
+  if (child.length > 0) return <Outlet />;
+
   const [tab, setTab] = useState<"now" | "soon">("now");
   const [q, setQ] = useState("");
   const [genre, setGenre] = useState("All");
