@@ -10,10 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CinemasRouteImport } from './routes/cinemas'
 import { Route as MoviesRouteImport } from './routes/movies'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as TicketsRouteImport } from './routes/tickets'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as BookShowIdRouteImport } from './routes/book.$showId'
 import { Route as MoviesIdRouteImport } from './routes/movies.$id'
 
@@ -22,9 +25,13 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CinemasRoute = CinemasRouteImport.update({
@@ -37,10 +44,20 @@ const MoviesRoute = MoviesRouteImport.update({
   path: '/movies',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TicketsRoute = TicketsRouteImport.update({
   id: '/tickets',
   path: '/tickets',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const BookShowIdRoute = BookShowIdRouteImport.update({
   id: '/book/$showId',
@@ -55,29 +72,36 @@ const MoviesIdRoute = MoviesIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
   '/cinemas': typeof CinemasRoute
   '/movies': typeof MoviesRouteWithChildren
+  '/reset-password': typeof ResetPasswordRoute
   '/tickets': typeof TicketsRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/book/$showId': typeof BookShowIdRoute
   '/movies/$id': typeof MoviesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
   '/cinemas': typeof CinemasRoute
   '/movies': typeof MoviesRouteWithChildren
+  '/reset-password': typeof ResetPasswordRoute
   '/tickets': typeof TicketsRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/book/$showId': typeof BookShowIdRoute
   '/movies/$id': typeof MoviesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/cinemas': typeof CinemasRoute
   '/movies': typeof MoviesRouteWithChildren
+  '/reset-password': typeof ResetPasswordRoute
   '/tickets': typeof TicketsRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/book/$showId': typeof BookShowIdRoute
   '/movies/$id': typeof MoviesIdRoute
 }
@@ -85,37 +109,46 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
+    | '/auth'
     | '/cinemas'
     | '/movies'
+    | '/reset-password'
     | '/tickets'
+    | '/admin'
     | '/book/$showId'
     | '/movies/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
+    | '/auth'
     | '/cinemas'
     | '/movies'
+    | '/reset-password'
     | '/tickets'
+    | '/admin'
     | '/book/$showId'
     | '/movies/$id'
   id:
     | '__root__'
     | '/'
-    | '/admin'
+    | '/_authenticated'
+    | '/auth'
     | '/cinemas'
     | '/movies'
+    | '/reset-password'
     | '/tickets'
+    | '/_authenticated/admin'
     | '/book/$showId'
     | '/movies/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   CinemasRoute: typeof CinemasRoute
   MoviesRoute: typeof MoviesRouteWithChildren
+  ResetPasswordRoute: typeof ResetPasswordRoute
   TicketsRoute: typeof TicketsRoute
   BookShowIdRoute: typeof BookShowIdRoute
 }
@@ -129,11 +162,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cinemas': {
@@ -150,12 +190,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MoviesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tickets': {
       id: '/tickets'
       path: '/tickets'
       fullPath: '/tickets'
       preLoaderRoute: typeof TicketsRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/book/$showId': {
       id: '/book/$showId'
@@ -174,6 +228,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 interface MoviesRouteChildren {
   MoviesIdRoute: typeof MoviesIdRoute
 }
@@ -187,9 +252,11 @@ const MoviesRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   CinemasRoute: CinemasRoute,
   MoviesRoute: MoviesRouteWithChildren,
+  ResetPasswordRoute: ResetPasswordRoute,
   TicketsRoute: TicketsRoute,
   BookShowIdRoute: BookShowIdRoute,
 }
