@@ -14,16 +14,235 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          capability: string
+          created_at: string
+          customer_name: string
+          email: string
+          id: string
+          movie_title: string
+          owner_id: string | null
+          payment: string
+          phone: string
+          poster_path: string
+          ref: string
+          screening_id: string
+          seats: string[]
+          status: string
+          total: number
+        }
+        Insert: {
+          capability: string
+          created_at?: string
+          customer_name: string
+          email: string
+          id?: string
+          movie_title: string
+          owner_id?: string | null
+          payment: string
+          phone: string
+          poster_path: string
+          ref: string
+          screening_id: string
+          seats: string[]
+          status?: string
+          total: number
+        }
+        Update: {
+          capability?: string
+          created_at?: string
+          customer_name?: string
+          email?: string
+          id?: string
+          movie_title?: string
+          owner_id?: string | null
+          payment?: string
+          phone?: string
+          poster_path?: string
+          ref?: string
+          screening_id?: string
+          seats?: string[]
+          status?: string
+          total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_screening_id_fkey"
+            columns: ["screening_id"]
+            isOneToOne: false
+            referencedRelation: "screenings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      movies: {
+        Row: {
+          created_at: string
+          genres: string[]
+          id: string
+          language: string
+          moods: string[]
+          poster_path: string
+          rating: string
+          runtime: number
+          score: number
+          status: string
+          synopsis: string
+          tagline: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          genres: string[]
+          id?: string
+          language?: string
+          moods?: string[]
+          poster_path: string
+          rating?: string
+          runtime: number
+          score?: number
+          status?: string
+          synopsis: string
+          tagline?: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          genres?: string[]
+          id?: string
+          language?: string
+          moods?: string[]
+          poster_path?: string
+          rating?: string
+          runtime?: number
+          score?: number
+          status?: string
+          synopsis?: string
+          tagline?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      screenings: {
+        Row: {
+          buffer_minutes: number
+          created_at: string
+          ends_at: string
+          format: string
+          id: string
+          movie_id: string
+          occupied_until: string
+          screen_id: string
+          starts_at: string
+          status: string
+        }
+        Insert: {
+          buffer_minutes?: number
+          created_at?: string
+          ends_at: string
+          format?: string
+          id?: string
+          movie_id: string
+          occupied_until: string
+          screen_id: string
+          starts_at: string
+          status?: string
+        }
+        Update: {
+          buffer_minutes?: number
+          created_at?: string
+          ends_at?: string
+          format?: string
+          id?: string
+          movie_id?: string
+          occupied_until?: string
+          screen_id?: string
+          starts_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "screenings_movie_id_fkey"
+            columns: ["movie_id"]
+            isOneToOne: false
+            referencedRelation: "movies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "screenings_screen_id_fkey"
+            columns: ["screen_id"]
+            isOneToOne: false
+            referencedRelation: "screens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      screens: {
+        Row: {
+          cinema_id: string
+          id: string
+          name: string
+        }
+        Insert: {
+          cinema_id: string
+          id: string
+          name: string
+        }
+        Update: {
+          cinema_id?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      available_seats: { Args: { show_id: string }; Returns: string[] }
+      cancel_ticket: { Args: { booking_capability: string }; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      reserve_tickets: {
+        Args: {
+          booking_capability: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          payment_method: string
+          selected_seats: string[]
+          show_id: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +369,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin"],
+    },
   },
 } as const

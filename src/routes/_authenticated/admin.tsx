@@ -4,7 +4,7 @@ import { cinemas, getShows, movies, npr, nextDays } from "@/lib/data";
 import { useBookings } from "@/lib/bookings";
 import { Logo } from "@/components/SiteHeader";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
       { title: "Admin Dashboard | RYZENX Cinema" },

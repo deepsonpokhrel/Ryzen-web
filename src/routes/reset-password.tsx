@@ -1,0 +1,8 @@
+import { createFileRoute } from '@tanstack/react-router';
+import { useEffect,useState } from 'react';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+export const Route=createFileRoute('/reset-password')({head:()=>({meta:[{title:'Reset Password | RYZENX Cinema'},{name:'description',content:'Reset your RYZENX Cinema password.'},{property:'og:title',content:'Reset Password | RYZENX Cinema'},{property:'og:description',content:'Choose a new account password.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary'}]}),component:Reset});
+function Reset(){const [valid,setValid]=useState(false);const [password,setPassword]=useState('');const [busy,setBusy]=useState(false);useEffect(()=>{setValid(window.location.hash.includes('type=recovery'));},[]);return <main className="mx-auto max-w-md px-4 py-16"><h1 className="text-3xl">Reset password</h1>{valid?<form className="mt-6 space-y-4" onSubmit={async e=>{e.preventDefault();setBusy(true);const {error}=await supabase.auth.updateUser({password});setBusy(false);error?toast.error(error.message):toast.success('Password updated.');}}><label>New password<Input type="password" required minLength={8} maxLength={128} value={password} onChange={e=>setPassword(e.target.value)}/></label><Button disabled={busy}>Save password</Button></form>:<p className="mt-4">Open the password reset link from your email.</p>}</main>;}
