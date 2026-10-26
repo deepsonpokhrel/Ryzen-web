@@ -11,3 +11,11 @@
 - [x] Tickets page: golden ticket cards
 - [x] Admin: restyled to brand
 - [x] Validate: build OK, 5 tests pass, full booking journey verified in browser
+
+# Movie and schedule management
+
+- [ ] Cloud catalogue, screens, schedules and booking safeguards
+- [ ] Secure staff login and administrator roles
+- [ ] Movie forms, poster uploads and schedule dashboard
+- [ ] Customer catalogue and booking integration
+- [ ] Automated tests, end-to-end checks and documentation
