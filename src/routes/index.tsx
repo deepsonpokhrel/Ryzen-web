@@ -1,3 +1,5 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { catalogueOptions } from '@/lib/catalogue';
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowRight, Clock, Globe, Sparkles, Star } from "lucide-react";
@@ -6,6 +8,7 @@ import { MOODS, movies, pickByMood } from "@/lib/data";
 import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/")({
+  loader: ({context}) => context.queryClient.ensureQueryData(catalogueOptions),
   head: () => ({
     meta: [
       { title: "RYZENX Cinema — Big stories. Better nights." },
@@ -20,11 +23,12 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const f = movies[0]!;
+  const {data:{movies}}=useSuspenseQuery(catalogueOptions);
+  const f = movies[0];
   const now = movies.filter((m) => m.status === "now");
   const soon = movies.filter((m) => m.status === "soon");
   const [mood, setMood] = useState<string | null>(null);
-  const picks = mood ? pickByMood(mood) : [];
+  const picks = mood ? movies.filter(m=>m.status==='now'&&(mood==='short'?m.minutes<120:m.moods.includes(mood))) : [];
 
   return (
     <div className="min-h-screen">
@@ -37,17 +41,17 @@ function Home() {
         <div className="relative mx-auto flex h-full max-w-[1200px] flex-col justify-center px-4 md:px-8">
           <p className="mb-4 text-[11px] font-semibold tracking-[0.35em] text-gold">NOW SHOWING</p>
           <h1 className="max-w-xl text-5xl leading-[1.05] tracking-tight md:text-7xl">Big stories. Better nights.</h1>
-          <p className="mt-5 max-w-sm text-foreground/85">{f.tagline}</p>
+          <p className="mt-5 max-w-sm text-foreground/85">{f?.tagline ?? 'Find your next favorite.'}</p>
           <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-foreground/80">
-            <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{f.duration}</span>
-            <span>{f.genres[0]}</span>
-            <span className="flex items-center gap-1.5"><Globe className="h-4 w-4" />{f.language}</span>
-            <span>{f.rating}</span>
+            <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{f?.duration}</span>
+            <span>{f?.genres[0]}</span>
+            <span className="flex items-center gap-1.5"><Globe className="h-4 w-4" />{f?.language}</span>
+            <span>{f?.rating}</span>
           </div>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/movies/$id" params={{ id: f.id }} className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-gold-foreground shadow-glow hover:opacity-90">
+            {f && <Link to="/movies/$id" params={{ id: f.id }} className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-gold-foreground shadow-glow hover:opacity-90">
               Pick your seats <ArrowRight className="h-4 w-4" />
-            </Link>
+            </Link>}
             <Link to="/movies" className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold hover:border-gold hover:text-gold">
               Explore Movies
             </Link>

@@ -1,3 +1,6 @@
+import { supabase } from '@/integrations/supabase/client';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { catalogueOptions } from '@/lib/catalogue';
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, CheckCircle2, Timer } from "lucide-react";
@@ -7,10 +10,14 @@ import { GoldenTicket } from "@/components/GoldenTicket";
 import { Logo } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/book/$showId")({
-  loader: ({ params }) => {
-    const show = parseShowId(params.showId);
+  loader: async ({ params,context }) => {
+    const {movies,shows}=await context.queryClient.ensureQueryData(catalogueOptions);
+    const show = shows.find(s=>s.id===params.showId);
     if (!show) throw notFound();
-    return { show };
+    const movie=movies.find(m=>m.id===show.movieId);
+    const cinema=cinemas.find(c=>c.id===show.cinemaId);
+    if(!movie||!cinema)throw notFound();
+    return { show,movie,cinema };
   },
   head: () => ({
     meta: [
@@ -30,19 +37,18 @@ const HOLD = 10 * 60;
 const MAX = 10;
 
 function BookPage() {
-  const { show } = Route.useLoaderData();
-  const movie = movies.find((m) => m.id === show.movieId)!;
-  const cinema = cinemas.find((c) => c.id === show.cinemaId)!;
+  const { show,movie,cinema } = Route.useLoaderData();
   const nav = useNavigate();
   const [step, setStep] = useState(1);
   const [sel, setSel] = useState<string[]>([]);
   const [left, setLeft] = useState(HOLD);
-  const [taken, setTaken] = useState<Set<string>>(() => soldSeats(show.id));
+  const [taken, setTaken] = useState<Set<string>>(new Set());
+  const [paying,setPaying]=useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", payment: "eSewa" });
   const [err, setErr] = useState("");
   const [done, setDone] = useState<Booking | null>(null);
 
-  useEffect(() => { setTaken(new Set([...soldSeats(show.id), ...bookedSeatsFor(show.id)])); }, [show.id]);
+  useEffect(() => { supabase.rpc('available_seats',{show_id:show.id}).then(({data})=>setTaken(new Set(data??[]))); }, [show.id]);
   useEffect(() => {
     if (!sel.length || done) return;
     const t = setInterval(() => setLeft((l) => l - 1), 1000);
@@ -50,7 +56,7 @@ function BookPage() {
   }, [sel.length, done]);
   useEffect(() => { if (left <= 0) { setSel([]); setStep(1); setLeft(HOLD); setErr("Your seat hold expired. Please choose seats again."); } }, [left]);
 
-  const subtotal = useMemo(() => sel.reduce((s, id) => s + seatPrice(id[0]!, show.format), 0), [sel, show.format]);
+  const subtotal = useMemo(() => sel.reduce((s, id) => s + seatPrice(id.charAt(0), show.format), 0), [sel, show.format]);
   const fees = sel.length * CONVENIENCE_FEE;
   const total = subtotal + fees;
 
@@ -60,14 +66,16 @@ function BookPage() {
     setSel((s) => s.includes(id) ? s.filter((x) => x !== id) : s.length >= MAX ? (setErr(`Max ${MAX} seats per booking.`), s) : [...s, id]);
   };
 
-  const pay = () => {
+  const pay = async () => {
+    if(paying)return;
     if (form.name.trim().length < 2) return setErr("Please enter your full name.");
     if (!/^\S+@\S+\.\S+$/.test(form.email)) return setErr("Please enter a valid email.");
     if (!/^9[78]\d{8}$/.test(form.phone)) return setErr("Enter a 10-digit Nepali mobile number (98XXXXXXXX).");
-    const fresh = bookedSeatsFor(show.id);
+    const fresh = new Set((await supabase.rpc('available_seats',{show_id:show.id})).data??[]);
     if (sel.some((s) => fresh.has(s))) return setErr("Some seats were just taken. Please reselect.");
     const b: Booking = { ref: newRef(), showId: show.id, movieId: movie.id, cinemaId: cinema.id, date: show.date, time: show.time, format: show.format, seats: [...sel].sort(), total, ...form, status: "Confirmed", createdAt: new Date().toISOString() };
-    addBooking(b); setDone(b); setStep(3);
+    setPaying(true);
+    try{const capability=crypto.randomUUID();const {data,error}=await supabase.rpc('reserve_tickets',{show_id:show.id,selected_seats:sel,customer_name:form.name,customer_email:form.email,customer_phone:form.phone,payment_method:form.payment,booking_capability:capability});if(error)throw new Error(error.message);const result=data as {ref:string;total:number};const saved={...b,ref:result.ref,total:result.total,capability,movieTitle:movie.title,poster:movie.poster};addBooking(saved);setDone(saved);setStep(3);}catch(e){setErr(e instanceof Error?e.message:'Booking failed. Try again.');}finally{setPaying(false);}
   };
 
   const mm = String(Math.floor(left / 60)).padStart(2, "0"), ss = String(left % 60).padStart(2, "0");
@@ -100,7 +108,7 @@ function BookPage() {
           <div className="mx-auto max-w-md text-center">
             <CheckCircle2 className="mx-auto h-12 w-12 text-success" />
             <h1 className="mt-4 text-4xl">Your movie night is on.</h1>
-            <p className="mb-6 mt-1 text-sm text-muted-foreground">Booking confirmed · reference sent to {done.email}</p>
+            <p className="mb-6 mt-1 text-sm text-muted-foreground">Booking confirmed · saved for {done.email}</p>
             <GoldenTicket booking={done} />
             <div className="mt-6 flex justify-center gap-3">
               <Link to="/tickets" className="rounded-full bg-gold px-5 py-2.5 text-sm font-semibold text-gold-foreground hover:opacity-90">View My Tickets</Link>
@@ -192,10 +200,10 @@ function BookPage() {
               ))}
               {show.format !== "2D" && <p className="text-xs text-muted-foreground">+ {show.format} surcharge included in seat price</p>}
               <p className="mb-2 mt-5 font-semibold">Selected seats</p>
-              {sel.map((s) => <div key={s} className="flex justify-between text-xs text-muted-foreground"><span>{s} · {seatCategory(s[0]!)}</span><span>{npr(seatPrice(s[0]!, show.format))}</span></div>)}
+              {sel.map((s) => <div key={s} className="flex justify-between text-xs text-muted-foreground"><span>{s} · {seatCategory(s.charAt(0))}</span><span>{npr(seatPrice(s.charAt(0), show.format))}</span></div>)}
               <div className="mt-4 flex justify-between border-t border-border pt-3 font-semibold"><span>Total</span><span>{npr(total)}</span></div>
-              <button disabled={!sel.length} onClick={() => (step === 1 ? (setErr(""), setStep(2)) : pay())} className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-gold py-3 font-semibold text-gold-foreground hover:opacity-90 disabled:opacity-40">
-                {step === 1 ? "Continue to Checkout" : `Pay ${npr(total)}`} <ArrowRight className="h-4 w-4" />
+              <button disabled={!sel.length||paying} onClick={() => (step === 1 ? (setErr(""), setStep(2)) : pay())} className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-gold py-3 font-semibold text-gold-foreground hover:opacity-90 disabled:opacity-40">
+                {paying?"Confirming…":step === 1 ? "Continue to Checkout" : `Pay ${npr(total)}`} <ArrowRight className="h-4 w-4" />
               </button>
             </aside>
           </div>
