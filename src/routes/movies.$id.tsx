@@ -1,3 +1,5 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { catalogueOptions } from '@/lib/catalogue';
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { Clock, Globe, Play } from "lucide-react";
@@ -6,7 +8,8 @@ import { useCity } from "@/lib/bookings";
 import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/movies/$id")({
-  loader: ({ params }) => {
+  loader: async ({ params,context }) => {
+    const {movies}=await context.queryClient.ensureQueryData(catalogueOptions);
     const movie = movies.find((m) => m.id === params.id);
     if (!movie) throw notFound();
     return { movie };
@@ -19,6 +22,7 @@ export const Route = createFileRoute("/movies/$id")({
       { property: "og:description", content: loaderData?.movie.synopsis ?? "Showtimes and tickets." },
       { property: "og:type", content: "video.movie" },
       { name: "twitter:card", content: "summary_large_image" },
+      ...(loaderData?.movie.poster.startsWith('https://') ? [{property:'og:image',content:loaderData.movie.poster},{name:'twitter:image',content:loaderData.movie.poster}] : []),
     ],
   }),
   component: MoviePage,
@@ -26,12 +30,13 @@ export const Route = createFileRoute("/movies/$id")({
 
 function MoviePage() {
   const { movie: m } = Route.useLoaderData();
+  const {data:{shows:allShows}}=useSuspenseQuery(catalogueOptions);
   const days = nextDays(5);
-  const [date, setDate] = useState(days[0]!);
+  const [date, setDate] = useState(days[0] ?? '');
   const [city, setCity] = useCity();
   const [format, setFormat] = useState("All");
   const [tab, setTab] = useState<"show" | "about">("show");
-  const shows = getShows(m.id, date).filter((s) => format === "All" || s.format === format);
+  const shows = allShows.filter(s=>s.movieId===m.id&&s.date===date).filter((s) => format === "All" || s.format === format);
   const list = cinemas.filter((c) => c.city === city).map((c) => ({ c, shows: shows.filter((s) => s.cinemaId === c.id) })).filter((x) => x.shows.length);
   const comingSoon = m.status === "soon";
 

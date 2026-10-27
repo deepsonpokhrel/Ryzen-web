@@ -1,3 +1,5 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { catalogueOptions } from '@/lib/catalogue';
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { MapPin } from "lucide-react";
@@ -5,6 +7,7 @@ import { cinemas, fmtDate, getShows, movies, nextDays } from "@/lib/data";
 import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/cinemas")({
+  loader: ({context}) => context.queryClient.ensureQueryData(catalogueOptions),
   head: () => ({
     meta: [
       { title: "Cinemas & Showtimes | RYZENX Cinema" },
@@ -19,8 +22,9 @@ export const Route = createFileRoute("/cinemas")({
 });
 
 function CinemasPage() {
-  const days = nextDays(3);
-  const [date, setDate] = useState(days[0]!);
+  const {data:{movies,shows:allShows}}=useSuspenseQuery(catalogueOptions);
+  const days = nextDays(5);
+  const [date, setDate] = useState(days[0] ?? '');
 
   return (
     <div className="min-h-screen">
@@ -37,7 +41,7 @@ function CinemasPage() {
 
         <div className="mt-6 space-y-4">
           {cinemas.map((c) => {
-            const shows = movies.filter((m) => m.status === "now").flatMap((m) => getShows(m.id, date).filter((s) => s.cinemaId === c.id).map((s) => ({ ...s, movie: m })));
+            const shows = movies.filter((m) => m.status === "now").flatMap((m) => allShows.filter(s=>s.movieId===m.id&&s.date===date).filter((s) => s.cinemaId === c.id).map((s) => ({ ...s, movie: m })));
             return (
               <div key={c.id} className="rounded-xl border border-border bg-card p-5">
                 <div className="flex flex-wrap items-start justify-between gap-2">

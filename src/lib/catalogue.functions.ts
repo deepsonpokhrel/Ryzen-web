@@ -41,7 +41,7 @@ function managementError(error: {message:string;code?:string}) {
 }
 export const saveMovie=createServerFn({method:'POST'}).middleware([requireAdmin]).inputValidator((input:unknown)=>movieSchema.parse(input)).handler(async({data,context})=>{
   const {id,...values}=data;
-  const file=await context.supabase.storage.from('movie-posters').list(values.poster_path.split('/').slice(0,-1).join('/'),{search:values.poster_path.split('/').at(-1)});
+  const file=await context.supabase.storage.from('movie-posters').list(values.poster_path.split('/').slice(0,-1).join('/'),{search:values.poster_path.split('/').at(-1) ?? ''});
   if(file.error||!file.data?.some(f=>f.name===values.poster_path.split('/').at(-1))) return {error:'Upload the poster before saving.'};
   const result=id?await context.supabase.from('movies').update(values).eq('id',id).select('id').single():await context.supabase.from('movies').insert(values).select('id').single();
   return result.error?{error:managementError(result.error)}:{id:result.data.id};
