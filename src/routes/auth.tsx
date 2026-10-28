@@ -22,8 +22,8 @@ export const Route = createFileRoute('/auth')({
 
 function Auth() {
   const nav = useNavigate();
-  const [username, setUsername] = useState(DEMO_STAFF.username);
-  const [password, setPassword] = useState(DEMO_STAFF.password);
+  const [username, setUsername] = useState<string>(DEMO_STAFF.username);
+  const [password, setPassword] = useState<string>(DEMO_STAFF.password);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   useEffect(() => { supabase.auth.getUser().then(({ data }) => { if (data.user) nav({ to: '/admin', replace: true }); }); }, [nav]);
