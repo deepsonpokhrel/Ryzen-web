@@ -15,7 +15,7 @@
 # Movie and schedule management
 
 - [ ] Cloud catalogue, screens, schedules and booking safeguards
-- [ ] Secure staff login and administrator roles
+- [x] Secure staff login (preconfigured admin account)
 - [ ] Movie forms, poster uploads and schedule dashboard
 - [ ] Customer catalogue and booking integration
 - [ ] Automated tests, end-to-end checks and documentation
