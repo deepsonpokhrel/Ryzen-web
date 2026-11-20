@@ -8,6 +8,13 @@
       "when": 1793020013153,
       "tag": "0000_cinema_management",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795184322806,
+      "tag": "0001_restrict_screens_and_posters",
+      "breakpoints": true
     }
   ]
 }
