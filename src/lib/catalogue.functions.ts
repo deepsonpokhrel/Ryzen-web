@@ -18,7 +18,7 @@ export const getCatalogue = createServerFn({method:'GET'}).handler(async () => {
   const db=createClient<Database>(url,key,{auth:{persistSession:false,autoRefreshToken:false},global:{fetch:(input,init)=>{const h=new Headers(init?.headers);if(h.get('Authorization')===`Bearer ${key}`)h.delete('Authorization');h.set('apikey',key);return fetch(input,{...init,headers:h});}}});
   const {supabaseAdmin:admin}=await import('@/integrations/supabase/client.server');
   const [ms,ss,screens]=await Promise.all([db.from('movies').select('*').order('created_at').limit(1000),db.from('screenings').select('*').gte('starts_at',new Date().toISOString()).order('starts_at').limit(1000),admin.from('screens').select('id,cinema_id')]);
-  if(ms.error || ss.error || screens.error) throw new Error('Unable to load the cinema catalogue. Please try again.');
+  if(ms.error || ss.error || screens.error){console.error('catalogue',ms.error,ss.error,screens.error);throw new Error('Unable to load the cinema catalogue. Please try again.');}
   const movies:Movie[]=await Promise.all((ms.data ?? []).map(async m=>{
     const poster=await admin.storage.from('movie-posters').createSignedUrl(m.poster_path,3600);
     return {id:m.id,title:m.title,tagline:m.tagline,synopsis:m.synopsis,genres:m.genres,minutes:m.runtime,duration:`${Math.floor(m.runtime/60)}h ${String(m.runtime%60).padStart(2,'0')}m`,language:m.language,rating:m.rating,score:Number(m.score),poster:poster.data?.signedUrl ?? '',status:m.status==='published'?'now':'soon',moods:m.moods};
